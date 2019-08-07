@@ -74,7 +74,7 @@ class Blockchain(object):
     def last_block(self):
         return self.chain[-1]
 
-    def proof_of_work(self, last_proof):
+    def proof_of_work(self):
         """
         Simple Proof of Work Algorithm
         Find a number p such that hash(last_block_string, p) contains 6 leading
@@ -84,7 +84,7 @@ class Blockchain(object):
         pass
 
     @staticmethod
-    def valid_proof(last_proof, proof):
+    def valid_proof(proof):
         """
         Validates the Proof:  Does hash(block_string, proof) contain 6
         leading zeroes?
@@ -177,6 +177,8 @@ def new_transaction():
 def full_chain():
     response = {
         # TODO: Return the chain and its current length
+        'chain': blockchain.chain,
+        'length': len(blockchain.chain)
     }
     return jsonify(response), 200
 

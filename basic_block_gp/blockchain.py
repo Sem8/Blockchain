@@ -97,7 +97,9 @@ class Blockchain(object):
 
         guess = f'{block_string}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
-        return guess_hash[:4] == '0000'       
+
+
+        return guess_hash[:4] == '0000'  
 
     def valid_chain(self, chain):
         """
@@ -107,21 +109,34 @@ class Blockchain(object):
         :return: <bool> True if valid, False if not
         """
 
-        last_block = chain[0]
+        
+        
+        
+        prev_block = chain[0]
         current_index = 1
 
         while current_index < len(chain):
             block = chain[current_index]
-            print(f'{last_block}')
+            print(f'{prev_block}')
             print(f'{block}')
             print("\n-------------------\n")
             # Check that the hash of the block is correct
             # TODO: Return false if hash isn't correct
+            if block['previous_hash'] != self.hash(prev_block):
+                # previous_hash = block['previous_hash']
+                # self_hash = self.hash(last_block)
+                # print(f'comaping hashes: {previous_hash} : {self_hash}')
+                return False
 
             # Check that the Proof of Work is correct
             # TODO: Return false if proof isn't correct
+            block_string = json.dumps(prev_block, sort_keys=True).encode()
+            if not self.valid_proof(block_string, block['proof']):
+                breakpoint()
+                print(f'found invalid proof of work')
+                return False
 
-            last_block = block
+            prev_block = block
             current_index += 1
 
         return True
@@ -144,8 +159,7 @@ def mine():
 
     print(f'Found valid proof!: {proof}')
 
-    # We must receive a reward for finding the proof.
-    # TODO:
+    # We must receive a reward for finding the proof.    
     # The sender is "0" to signify that this node has mine a new coin
     # The recipient is the current node, it did the mining!
     # The amount is 1 coin as a reward for mining the next block
@@ -194,6 +208,14 @@ def full_chain():
         'chain': blockchain.chain,
         'length': len(blockchain.chain)
     }
+    return jsonify(response), 200
+
+@app.route('/chain_validity', methods=['GET'])
+def chain_validity():
+    response = {
+        'valid_chain': blockchain.valid_chain(blockchain.chain)
+    }
+
     return jsonify(response), 200
 
 

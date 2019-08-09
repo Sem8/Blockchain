@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from flask import Flask, jsonify, request
 from urllib.parse import urlparse
+import requests
 
 import sys
 
@@ -175,7 +176,7 @@ class Blockchain(object):
 
         # Grab and verify the chains from all the nodes in our network
         for node in neighbors:
-            response = request.get(f'http://{node}/chain')
+            response = requests.get(f'http://{node}/chain')
 
             if response.status_code == 200:
                 length = response.json()['length']
@@ -197,7 +198,7 @@ class Blockchain(object):
         post_data = {'block': new_block}
 
         for node in neighbors:
-            r = request.post(f'http://{node}/block/new', json=post_data)
+            r = requests.post(f'http://{node}/block/new', json=post_data)
 
             if r.status_code != 200:
                 # Error handling
